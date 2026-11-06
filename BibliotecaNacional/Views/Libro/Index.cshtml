@@ -1,0 +1,294 @@
+@model IEnumerable<BibliotecaNacional.Models.Libro>
+
+@{
+    ViewData["Title"] = "Biblioteca Nacional";
+
+    var categorias = ViewBag.Categorias as List<string> ?? new List<string>();
+    var estados = ViewBag.Estados as List<string> ?? new List<string>();
+
+    string buscar = ViewBag.Buscar as string ?? "";
+    string categoriaSeleccionada = ViewBag.CategoriaSeleccionada as string ?? "";
+    string estadoSeleccionado = ViewBag.EstadoSeleccionado as string ?? "";
+}
+
+<div class="container mt-4">
+
+    <!-- Título -->
+    <div class="text-center mb-4">
+        <h1 class="display-5">Biblioteca Nacional</h1>
+        <p class="lead">
+            Sistema de gestión y consulta de libros
+        </p>
+    </div>
+
+    <!-- Mensaje de éxito -->
+    @if (TempData["Mensaje"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Mensaje"]
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+        </div>
+    }
+
+    <!-- Resumen -->
+    <div class="row mb-4">
+
+        <div class="col-md-6 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total de libros</h5>
+                    <h2>@ViewBag.TotalLibros</h2>
+                    <p class="text-muted">
+                        Libros registrados en la biblioteca
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Resultados encontrados</h5>
+                    <h2>@ViewBag.TotalResultados</h2>
+                    <p class="text-muted">
+                        Según los filtros seleccionados
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Buscador y filtros -->
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header">
+            <h5 class="mb-0">Buscar y filtrar libros</h5>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="Index" method="get">
+
+                <div class="row">
+
+                    <!-- Buscar -->
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">
+                            Buscar por título o autor
+                        </label>
+
+                        <input type="text"
+                               name="buscar"
+                               value="@buscar"
+                               class="form-control"
+                               placeholder="Ejemplo: García Márquez" />
+                    </div>
+
+                    <!-- Categoría -->
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">
+                            Categoría
+                        </label>
+
+                        <select name="categoria" class="form-select">
+
+                            <option value="">
+                                Todas las categorías
+                            </option>
+
+                            @foreach (var cat in categorias)
+                            {
+                                if (cat == categoriaSeleccionada)
+                                {
+                                    <option value="@cat" selected>
+                                        @cat
+                                    </option>
+                                }
+                                else
+                                {
+                                    <option value="@cat">
+                                        @cat
+                                    </option>
+                                }
+                            }
+
+                        </select>
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="col-md-3 mb-3">
+
+                        <label class="form-label">
+                            Estado
+                        </label>
+
+                        <select name="estado" class="form-select">
+
+                            <option value="">
+                                Todos los estados
+                            </option>
+
+                            @foreach (var est in estados)
+                            {
+                                if (est == estadoSeleccionado)
+                                {
+                                    <option value="@est" selected>
+                                        @est
+                                    </option>
+                                }
+                                else
+                                {
+                                    <option value="@est">
+                                        @est
+                                    </option>
+                                }
+                            }
+
+                        </select>
+
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="col-md-2 mb-3 d-flex align-items-end">
+
+                        <div class="w-100">
+
+                            <button type="submit"
+                                    class="btn btn-primary w-100 mb-2">
+                                Buscar
+                            </button>
+
+                            <a asp-action="Index"
+                               class="btn btn-secondary w-100">
+                                Limpiar
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <!-- Botón agregar -->
+    <div class="mb-3">
+        <a asp-action="Create"
+           class="btn btn-success">
+            + Agregar nuevo libro
+        </a>
+    </div>
+
+    <!-- Mensaje cuando no hay resultados -->
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-warning">
+            No se encontraron libros con los criterios de búsqueda seleccionados.
+        </div>
+    }
+    else
+    {
+        <!-- Tabla -->
+        <div class="table-responsive">
+
+            <table class="table table-bordered table-striped table-hover align-middle">
+
+                <thead class="table-dark">
+
+                    <tr>
+                        <th>ID</th>
+                        <th>Título</th>
+                        <th>Autor</th>
+                        <th>Categoría</th>
+                        <th>Año</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @foreach (var libro in Model)
+                    {
+                        <tr>
+
+                            <td>@libro.Id</td>
+
+                            <td>
+                                @libro.Titulo
+                            </td>
+
+                            <td>
+                                @libro.Autor
+                            </td>
+
+                            <td>
+                                @libro.Categoria
+                            </td>
+
+                            <td>
+                                @libro.AnioPublicacion
+                            </td>
+
+                            <td>
+                                @if (libro.Estado == "Disponible")
+                                {
+                                    <span class="badge bg-success">
+                                        Disponible
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">
+                                        @libro.Estado
+                                    </span>
+                                }
+                            </td>
+
+                            <td>
+
+                                <div class="btn-group"
+                                     role="group">
+
+                                    <a asp-action="Details"
+                                       asp-route-id="@libro.Id"
+                                       class="btn btn-sm btn-info">
+                                        Ver
+                                    </a>
+
+                                    <a asp-action="Edit"
+                                       asp-route-id="@libro.Id"
+                                       class="btn btn-sm btn-primary">
+                                        Editar
+                                    </a>
+
+                                    <a asp-action="Delete"
+                                       asp-route-id="@libro.Id"
+                                       class="btn btn-sm btn-danger">
+                                        Eliminar
+                                    </a>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    }
+
+</div>
